@@ -1,4 +1,3 @@
-{{- if and (.Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
 {{- $annotations := dict }}
 {{- $_ := merge $annotations .Values.ingress.annotations .Values.jxRequirements.ingress.annotations  }}
 {{- if not (hasKey $annotations "kubernetes.io/ingress.class") }}
@@ -28,11 +27,8 @@ spec:
             name: {{ .Values.service.name }}
             port:
               number: {{ .Values.service.externalPort }}
-{{- if eq "NodePort" .Values.jxRequirements.ingress.serviceType }}
-        path: "/{{ .Release.Namespace }}/hook"
-{{- else if .Values.jxRequirements.ingress.domain }}
+        path: /
     host: {{ .Values.service.name }}{{ .Values.jxRequirements.ingress.namespaceSubDomain }}{{ .Values.jxRequirements.ingress.domain }}
-{{- end }}
 {{- if .Values.jxRequirements.ingress.tls.enabled }}
   tls:
   - hosts:
@@ -43,6 +39,5 @@ spec:
     secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
 {{- else }}
     secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
-{{- end }}
 {{- end }}
 {{- end }}
